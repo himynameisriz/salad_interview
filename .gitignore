@@ -1,0 +1,5 @@
+# ignore local objects
+.vscode
+bin
+appsettings.Development.json
+obj
