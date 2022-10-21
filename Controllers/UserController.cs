@@ -67,15 +67,20 @@ public class UserController : ControllerBase
     [HttpDelete("/users/{userId}/games/{gameId}")]
     public async Task<IActionResult> DeleteGameFromUser([FromRoute]int userId, [FromRoute]int gameId)
     {
-        return NotFound(); // not currently tested to be implemented properly
-
         var user = Users.FirstOrDefault(u => u.Id == userId);
-        var game = user?.Games.FirstOrDefault(g => g.Id == gameId);
-        if (user == null || game == null)
+        if (user == null)
         {
+            _logger.Log(LogLevel.Warning, $"No user found with id {userId}");
+            return NotFound();
+        }
+
+        var game = user?.Games.FirstOrDefault(g => g.Id == gameId);
+        if (game == null)
+        {
+            _logger.Log(LogLevel.Warning, $"No game found with id {gameId}");
             return NotFound();
         }
         user.Games.Remove(game);
-        return Ok();
+        return NoContent();
     }
 }
