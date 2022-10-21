@@ -1,12 +1,12 @@
 public class User
 {
     public int Id { get; set; }
-    public IEnumerable<string> Games { get; set; }
+    public List<Game> Games { get; set; }
 
     public User(int id)
     {
         Id = id;
-        Games = new List<string>();
+        Games = new List<Game>();
     }
 
     public override string ToString()

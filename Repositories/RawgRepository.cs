@@ -8,7 +8,7 @@ class RawgRepository : IRawgRepository
     {
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        if (rawgConfiguration == null ) 
+        if (rawgConfiguration == null)
         {
             throw new ArgumentNullException(nameof(rawgConfiguration));
         }
@@ -17,8 +17,8 @@ class RawgRepository : IRawgRepository
     }
     public async Task<Game> GetGameById(int id)
     {
-        var paramString = $"/{id}?key={_apiKey}";
-        _logger.Log(LogLevel.Information, $"paramString = '{paramString}'");        
+        var paramString = $"{id}?key={_apiKey}";
+        _logger.Log(LogLevel.Information, $"full url 14503b21c59c435aabc4b1a4f8659de4= '{_rawgClient.BaseAddress}/{paramString}' ");
         return await _rawgClient.GetFromJsonAsync<Game>(paramString);
     }
 
@@ -29,7 +29,7 @@ class RawgRepository : IRawgRepository
         {
             paramString += $"&ordering={sort}";
         }
-        _logger.Log(LogLevel.Information, $"paramString = '{paramString}'");        
+        _logger.Log(LogLevel.Information, $"full url = '{_rawgClient.BaseAddress}{paramString}' ");
         var rawgResponse = await _rawgClient.GetFromJsonAsync<RawgResponse>(paramString);
         return rawgResponse.Results;
     }

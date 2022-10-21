@@ -6,7 +6,7 @@ public class GameController : ControllerBase
 {
     private IRawgRepository _rawgRepository;
     private readonly ILogger<GameController> _logger;
-    private readonly List<string> AvalabileOrdering = new List<string>()
+    private readonly List<string> AvalabileOrdering = new()
     {
         "name", "released", "added", "created", "updated", "rating", "metacritic",
         "-name", "-released", "-added", "-created", "-updated", "-rating", "-metacritic",
@@ -19,7 +19,7 @@ public class GameController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get(string q, string? sort)
+    public async Task<IActionResult> Get(string q, string? sort = "")
     {
         if (string.IsNullOrWhiteSpace(q)) 
         {
