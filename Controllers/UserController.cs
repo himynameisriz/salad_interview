@@ -8,11 +8,18 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     private IRawgRepository _rawgRepository;
     private List<User> Users;
+    private readonly List<string> AllowedComparisons = new() { "union", "intersection", "difference" };
     public UserController(ILogger<UserController> logger, IMemoryCache cache, IRawgRepository rawgRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rawgRepository = rawgRepository ?? throw new ArgumentNullException(nameof(rawgRepository));
         cache.TryGetValue("Users", out Users);
+    }
+
+    [HttpGet]
+    public IActionResult GetAllUsers()
+    {
+        return Ok(Users);
     }
 
     [HttpGet("{userId}")]
@@ -82,5 +89,50 @@ public class UserController : ControllerBase
         }
         user.Games.Remove(game);
         return NoContent();
+    }
+
+    [HttpPost("/users/{userId:int}/comparison")]
+    public IActionResult CompareGames([FromRoute]int userId, [FromBody]GameComparisonRequestObject comparisonRequestObject)
+    {
+        if (!AllowedComparisons.Contains(comparisonRequestObject.Comparison))
+        {
+            _logger.Log(LogLevel.Warning, $"Incorrect usage of comparison, used {comparisonRequestObject.Comparison}");
+            return BadRequest("Incorrect usage of comparison, please use one of the following available comparisons: " + 
+                string.Join(", ", AllowedComparisons.Select(s => $"'{s}'")));
+        }
+        
+        var firstUser = Users.FirstOrDefault(u => u.Id == userId);
+        if (firstUser == null)
+        {
+            return NotFound($"User {userId} does not exist");
+        }
+        Console.WriteLine("First user found, searching second with " + comparisonRequestObject.OtherUserId);
+        var secondUser = Users.FirstOrDefault(u => u.Id == comparisonRequestObject.OtherUserId);
+        if (secondUser == null)
+        {
+            return NotFound($"'otherUser' {comparisonRequestObject.OtherUserId} does not exist");
+        }
+
+        var games = CompareGames(firstUser, secondUser, comparisonRequestObject.Comparison);
+        return Ok(new { 
+            userId = firstUser.Id,
+            otherUserId = secondUser.Id,
+            comparison = comparisonRequestObject.Comparison,
+            games
+        });
+    }
+
+    private IEnumerable<Game> CompareGames(User firstUser, User secondUser, string comparison)
+    {
+        Console.WriteLine("First user's games: " + string.Join(", ", firstUser.Games.Select(g => g.Id)));
+        Console.WriteLine("Second user's games: " + string.Join(", ", secondUser.Games.Select(g => g.Id)));
+        switch (comparison)
+        {
+            case "union": return firstUser.Games.Union<Game>(secondUser.Games).Distinct();
+            case "intersection": return firstUser.Games.Intersect<Game>(secondUser.Games);
+            case "difference": return firstUser.Games.Except<Game>(secondUser.Games);
+        }
+
+        return new List<Game>();
     }
 }

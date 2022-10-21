@@ -1,5 +1,5 @@
 using System.Text.Json;
-public class Game
+public class Game : IEquatable<Game>
 {
 
 /* requrements
@@ -25,4 +25,8 @@ public class Game
     {
         return JsonSerializer.Serialize(this).ToString();
     }
+
+    public bool Equals(Game? otherGame) => this.Id == otherGame?.Id;
+    public override bool Equals(object? obj) => Equals(obj as Game);
+    public override int GetHashCode() => (Id).GetHashCode();
 }
