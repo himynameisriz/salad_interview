@@ -106,7 +106,7 @@ public class UserController : ControllerBase
         {
             return NotFound($"User {userId} does not exist");
         }
-        Console.WriteLine("First user found, searching second with " + comparisonRequestObject.OtherUserId);
+        
         var secondUser = Users.FirstOrDefault(u => u.Id == comparisonRequestObject.OtherUserId);
         if (secondUser == null)
         {
@@ -124,8 +124,8 @@ public class UserController : ControllerBase
 
     private IEnumerable<Game> CompareGames(User firstUser, User secondUser, string comparison)
     {
-        Console.WriteLine("First user's games: " + string.Join(", ", firstUser.Games.Select(g => g.Id)));
-        Console.WriteLine("Second user's games: " + string.Join(", ", secondUser.Games.Select(g => g.Id)));
+        _logger.Log(LogLevel.Trace, "First user's (" + firstUser.Id + ") games: " + string.Join(", ", firstUser.Games.Select(g => g.Id)));
+        _logger.Log(LogLevel.Trace, "Second user's (" + secondUser.Id + ") games: " + string.Join(", ", secondUser.Games.Select(g => g.Id)));
         switch (comparison)
         {
             case "union": return firstUser.Games.Union<Game>(secondUser.Games).Distinct();
