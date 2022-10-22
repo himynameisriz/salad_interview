@@ -84,14 +84,14 @@ public class UserController : ControllerBase
         var game = user?.Games.FirstOrDefault(g => g.Id == gameId);
         if (game == null)
         {
-            _logger.Log(LogLevel.Warning, $"No game found with id {gameId}");
+            _logger.Log(LogLevel.Warning, $"No game found with id {gameId} for {userId}");
             return NotFound();
         }
         user.Games.Remove(game);
         return NoContent();
     }
 
-    [HttpPost("/users/{userId:int}/comparison")]
+    [HttpPost("/users/{userId}/comparison")]
     public IActionResult CompareGames([FromRoute]int userId, [FromBody]GameComparisonRequestObject comparisonRequestObject)
     {
         if (!AllowedComparisons.Contains(comparisonRequestObject.Comparison))
@@ -106,7 +106,7 @@ public class UserController : ControllerBase
         {
             return NotFound($"User {userId} does not exist");
         }
-        
+
         var secondUser = Users.FirstOrDefault(u => u.Id == comparisonRequestObject.OtherUserId);
         if (secondUser == null)
         {

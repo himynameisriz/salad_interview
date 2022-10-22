@@ -17,19 +17,20 @@ class RawgRepository : IRawgRepository
     }
     public async Task<Game> GetGameById(int id)
     {
-        var paramString = $"{id}?key={_apiKey}";
-        _logger.Log(LogLevel.Information, $"full url 14503b21c59c435aabc4b1a4f8659de4= '{_rawgClient.BaseAddress}/{paramString}' ");
+        var paramString = $"games/{id}?key={_apiKey}";
+        
+        _logger.Log(LogLevel.Information, $"full url: '{_rawgClient.BaseAddress}/{paramString}' ");
         return await _rawgClient.GetFromJsonAsync<Game>(paramString);
     }
 
     public async Task<IEnumerable<Game>> GetGames(string query, string sort)
     {
-        var paramString = $"?key={_apiKey}&search={query}";
+        var paramString = $"games?key={_apiKey}&search={query}";
         if (!string.IsNullOrWhiteSpace(sort))
         {
             paramString += $"&ordering={sort}";
         }
-        _logger.Log(LogLevel.Information, $"full url = '{_rawgClient.BaseAddress}{paramString}' ");
+        _logger.Log(LogLevel.Information, $"full url: '{_rawgClient.BaseAddress}{paramString}' ");
         var rawgResponse = await _rawgClient.GetFromJsonAsync<RawgResponse>(paramString);
         return rawgResponse.Results;
     }
